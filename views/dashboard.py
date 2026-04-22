@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import matplotlib.pyplot as plt
 
 st.markdown("<h1 class='main-header'>Readiness Metrics</h1>", unsafe_allow_html=True)
 st.caption("Review institutional engagement data and incident statistics powered by simulated protocol analytics.")
@@ -10,11 +10,11 @@ total_users = 150
 avg_score = 82.5
 total_sims = 342
 recent_scores = [
-    ("Alice", 95, "2026-04-22 10:30"),
-    ("Bob", 85, "2026-04-22 11:15"),
-    ("Charlie", 70, "2026-04-22 12:45"),
-    ("Diana", 100, "2026-04-22 13:20"),
-    ("Eve", 90, "2026-04-22 14:05")
+    ("Vishwa", 95, "2026-04-22 10:30"),
+    ("Ganesh", 85, "2026-04-22 11:15"),
+    ("Manvith", 99.5, "2026-04-22 12:45"),
+    ("Hariharan", 100, "2026-04-22 13:20"),
+    ("Symmalo Rao Sir", 90, "2026-04-22 14:05")
 ]
 
 st.markdown("---")
@@ -32,7 +32,7 @@ with col4:
 
 st.markdown("---")
 
-# Row 1: Interactive Charts
+# Row 1: Charts
 r1c1, r1c2 = st.columns(2)
 
 with r1c1:
@@ -46,22 +46,31 @@ with r1c2:
         "Hazard Type": ["Earthquakes", "Floods", "Fires", "Cyclones", "Heatwaves"],
         "Reported Instances": [15, 45, 20, 10, 30]
     }
-    df_pie = pd.DataFrame(pie_data)
     
-    fig_pie = px.pie(
-        df_pie, 
-        names="Hazard Type", 
-        values="Reported Instances", 
-        hole=0.4,
-        color_discrete_sequence=px.colors.qualitative.Pastel
+    # Matplotlib Pie Chart
+    fig1, ax1 = plt.subplots(figsize=(6, 4))
+    fig1.patch.set_facecolor('none')
+    ax1.set_facecolor('none')
+    
+    colors = ['#FF4B4B', '#FF8F8F', '#FFCACA', '#D83131', '#9E1A1A']
+    wedges, texts, autotexts = ax1.pie(
+        pie_data["Reported Instances"], 
+        labels=pie_data["Hazard Type"], 
+        autopct='%1.1f%%', 
+        startangle=140,
+        colors=colors,
+        textprops={'color':"w", 'fontsize': 10},
+        pctdistance=0.85,
+        explode=[0.05]*5
     )
-    fig_pie.update_layout(
-        margin=dict(l=20, r=20, t=20, b=20),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='white')
-    )
-    st.plotly_chart(fig_pie, use_container_width=True)
+    
+    # Draw circle for donut effect
+    centre_circle = plt.Circle((0,0),0.70,fc='#0E1117')
+    fig1.gca().add_artist(centre_circle)
+    
+    ax1.axis('equal')  
+    plt.tight_layout()
+    st.pyplot(fig1)
 
 st.markdown("---")
 
@@ -71,22 +80,25 @@ line_data = {
     "Month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     "Attendance (%)": [35, 38, 42, 40, 55, 60, 65, 70, 75, 78, 80, 82]
 }
-df_line = pd.DataFrame(line_data)
 
-fig_line = px.line(
-    df_line, 
-    x="Month", 
-    y="Attendance (%)", 
-    markers=True,
-    labels={"Attendance (%)": "Participation Rate (%)"}
-)
-fig_line.update_traces(line_color="#FF4B4B", line_width=3, marker_size=8)
-fig_line.update_layout(
-    margin=dict(l=20, r=20, t=40, b=20),
-    paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)',
-    font=dict(color='white'),
-    xaxis=dict(showgrid=False),
-    yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)')
-)
-st.plotly_chart(fig_line, use_container_width=True)
+# Matplotlib Line Chart
+fig2, ax2 = plt.subplots(figsize=(10, 4))
+fig2.patch.set_facecolor('none')
+ax2.set_facecolor('none')
+
+ax2.plot(line_data["Month"], line_data["Attendance (%)"], marker='o', color='#FF4B4B', linewidth=3, markersize=8)
+
+# Styling
+ax2.set_ylabel('Participation Rate (%)', color='white', fontsize=10)
+ax2.tick_params(axis='x', colors='white', labelsize=9)
+ax2.tick_params(axis='y', colors='white', labelsize=9)
+ax2.grid(True, linestyle='--', alpha=0.1, color='white')
+
+# Remove top and right spines
+ax2.spines['top'].set_visible(False)
+ax2.spines['right'].set_visible(False)
+ax2.spines['bottom'].set_color('white')
+ax2.spines['left'].set_color('white')
+
+plt.tight_layout()
+st.pyplot(fig2)
